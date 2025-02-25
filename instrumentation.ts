@@ -1,7 +1,7 @@
 import { registerOTel } from '@vercel/otel'
 import { SimpleSpanProcessor, SpanExporter } from '@opentelemetry/sdk-trace-base'
 import { createExportTraceServiceRequest } from "@opentelemetry/otlp-transformer";
-import { SpanContext } from "@opentelemetry/api";
+import { SpanContext, TraceFlags } from "@opentelemetry/api";
 import { IExportTraceServiceRequest } from "@opentelemetry/otlp-transformer";
 import { trace as tracing } from "@opentelemetry/api";
 
@@ -54,7 +54,11 @@ export function register() {
       fields: () => [], extract(context) {
         const { rootSpanContext } = requestContext()?.telemetry ?? {};
         return rootSpanContext
-          ? tracing.setSpanContext(context, rootSpanContext)
+          ? tracing.setSpanContext(context, {
+            ...rootSpanContext,
+            isRemote: true,
+            traceFlags: TraceFlags.SAMPLED,
+          })
           : context;
       },
     }]
