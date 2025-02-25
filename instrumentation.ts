@@ -3,6 +3,7 @@ import { SimpleSpanProcessor, SpanExporter } from '@opentelemetry/sdk-trace-base
 import { createExportTraceServiceRequest } from "@opentelemetry/otlp-transformer";
 import { SpanContext } from "@opentelemetry/api";
 import { IExportTraceServiceRequest } from "@opentelemetry/otlp-transformer";
+import { trace as tracing } from "@opentelemetry/api";
 
 interface Reader {
   get: () => {
@@ -47,6 +48,15 @@ export function register() {
 
   registerOTel({
     serviceName: 'vercel-otel-example',
-    spanProcessors: ["auto", spanProcessor]
+    spanProcessors: ["auto", spanProcessor],
+    propagators: [{
+      inject: () => undefined,
+      fields: () => [], extract(context) {
+        const { rootSpanContext } = requestContext()?.telemetry ?? {};
+        return rootSpanContext
+          ? tracing.setSpanContext(context, rootSpanContext)
+          : context;
+      },
+    }]
   })
 }
