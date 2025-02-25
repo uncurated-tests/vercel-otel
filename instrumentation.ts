@@ -46,6 +46,7 @@ export function register() {
   const spanProcessor = new SimpleSpanProcessor(spanExporter);
 
   registerOTel({
+    serviceName: 'vercel-otel-example',
     spanProcessors: [spanProcessor]
   })
 }
