@@ -47,6 +47,6 @@ export function register() {
 
   registerOTel({
     serviceName: 'vercel-otel-example',
-    spanProcessors: [spanProcessor]
+    spanProcessors: ["auto", spanProcessor]
   })
 }
